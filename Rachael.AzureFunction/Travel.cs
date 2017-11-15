@@ -8,9 +8,10 @@ using Microsoft.Azure.WebJobs.Host;
 
 namespace Rachael.AzureFunction
 {
-    public static class Test
+    public static class Travel
     {
-        [FunctionName("Test")]
+        // /api/Travel
+        [FunctionName("Travel")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");

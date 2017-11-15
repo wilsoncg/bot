@@ -7,4 +7,5 @@ Running as an Azure Function, requires:
 
 Useful links:
 
-To learn how to debug Azure Bot Service bots, please visit https://aka.ms/bf-docs-azure-debug
+* To get started https://blogs.msdn.microsoft.com/webdev/2017/05/10/azure-function-tools-for-visual-studio-2017/
+* To learn how to debug Azure Bot Service bots, please visit https://aka.ms/bf-docs-azure-debug
