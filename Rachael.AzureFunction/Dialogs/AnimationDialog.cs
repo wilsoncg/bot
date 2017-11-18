@@ -6,11 +6,15 @@ using Microsoft.Bot.Connector;
 
 namespace Rachael.AzureFunction.Dialogs
 {
-    // https://gph.is/1QQH2a2
-    // incept date May 26, 2017
     [Serializable]
     public class AnimationDialog : IDialog<object>
     {
+        private string _url;
+        public AnimationDialog(string url)
+        {
+            _url = url;
+        }
+
         public Task StartAsync(IDialogContext context)
         {
             try
@@ -35,10 +39,10 @@ namespace Rachael.AzureFunction.Dialogs
             var attachment = GetAnimationCard();
             message.Attachments.Add(attachment);
             await context.PostAsync(message);
-            context.Wait(this.MessageReceivedAsync);
+            context.Wait(MessageReceivedAsync);
         }
 
-        private static Attachment GetAnimationCard()
+        private Attachment GetAnimationCard()
         {
             var animationCard = new AnimationCard
             {
@@ -46,7 +50,7 @@ namespace Rachael.AzureFunction.Dialogs
                 {
                     new MediaUrl()
                     {
-                        Url = "https://media.giphy.com/media/4BhmY3ZsKN5q8/giphy.gif"
+                        Url = _url
                     }
                 }
             };

@@ -13,15 +13,18 @@ using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Rachael.AzureFunction.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Internals;
+using Autofac;
 
 namespace Rachael.AzureFunction
 {
-    public static class About
+    [BotAuthentication]
+    public static class Messages
     {
-        [FunctionName("About")]
+        [FunctionName("Messages")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
-            log.Info("About function triggered.");
+            log.Info("Messages function triggered.");
 
             using (BotService.Initialize())
             {
@@ -39,9 +42,30 @@ namespace Rachael.AzureFunction
                     switch (activity.GetActivityType())
                     {
                         case ActivityTypes.Message:
-                            await Conversation.SendAsync(activity, () => new AnimationDialog());
+                            await Conversation.SendAsync(activity, () => new AboutLuisDialog());
                             break;
                         case ActivityTypes.ConversationUpdate:
+                            IConversationUpdateActivity update = activity;
+                            using (var scope = DialogModule.BeginLifetimeScope(Conversation.Container, activity))
+                            {
+                                var client = scope.Resolve<IConnectorClient>();
+                                if (update.MembersAdded.Any())
+                                {
+                                    var reply = activity.CreateReply();
+                                    var newMembers = update.MembersAdded?.Where(t => t.Id != activity.Recipient.Id);
+                                    foreach (var newMember in newMembers)
+                                    {
+                                        reply.Text = "Welcome";
+                                        if (!string.IsNullOrEmpty(newMember.Name))
+                                        {
+                                            reply.Text += $" {newMember.Name}";
+                                        }
+                                        reply.Text += "!";
+                                        await client.Conversations.ReplyToActivityAsync(reply);
+                                    }
+                                }
+                            }
+                            break;
                         case ActivityTypes.ContactRelationUpdate:
                         case ActivityTypes.Typing:
                         case ActivityTypes.DeleteUserData:
