@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rachael.AzureFunction", "Ra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{218AB6CD-4FE8-4715-88EB-BF40F8301BF6}"
 	ProjectSection(SolutionItems) = preProject
-		rachael-emulator.PNG = rachael-emulator.PNG
+		rachael-emulator.png = rachael-emulator.png
 		rachael-icon.png = rachael-icon.png
 		readme.md = readme.md
 	EndProjectSection
