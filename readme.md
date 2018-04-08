@@ -17,3 +17,9 @@ Useful links:
 
 * To get started https://blogs.msdn.microsoft.com/webdev/2017/05/10/azure-function-tools-for-visual-studio-2017/
 * To learn how to debug Azure Bot Service bots, please visit https://aka.ms/bf-docs-azure-debug
+* Microsoft applications: https://apps.dev.microsoft.com
+* LUIS applications: https://eu.luis.ai/applications/
+* Bot framework: https://dev.botframework.com/bots
+* Resources viewer: https://resources.azure.com
+* Full list of app settings variables: https://docs.microsoft.com/en-gb/azure/azure-functions/functions-app-settings
+ 
