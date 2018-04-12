@@ -22,4 +22,4 @@ Useful links:
 * Bot framework: https://dev.botframework.com/bots
 * Resources viewer: https://resources.azure.com
 * Full list of app settings variables: https://docs.microsoft.com/en-gb/azure/azure-functions/functions-app-settings
- 
+* Azure functions authentication/keys https://github.com/Azure/azure-functions-host/wiki/Http-Functions
