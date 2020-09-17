@@ -22,7 +22,10 @@ namespace Rachael.AzureFunction
     public static class Messages
     {
         [FunctionName("Messages")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]
+            HttpRequestMessage req, 
+            TraceWriter log)
         {
             log.Info("Messages function triggered.");
 
