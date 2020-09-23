@@ -1,9 +1,8 @@
 {
   "profiles": {
     "Rachael.AzureFunction": {
-      "commandName": "Executable",
-      "executablePath": "%APPDATA%\\npm\\func.cmd",
-      "commandLineArgs": "host start",
+      "commandName": "Project",
+      "commandLineArgs": "host start --csharp",
       "workingDirectory": "$(TargetDir)"
     }
   }

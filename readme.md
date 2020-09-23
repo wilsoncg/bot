@@ -3,8 +3,9 @@
 ![Rachael](rachael-icon.png)
 
 Features:
-* Running on a consumption model as an Azure function
-* Connected to the [LUIS](https://eu.luis.ai) language understanding service
+* Running on a consumption model as an Azure function **[v3.x](https://docs.microsoft.com/en-us/azure/azure-functions/functions-versions)**
+* Connected to the [LUIS](https://eu.luis.ai) language understanding service **[v2.0](https://docs.microsoft.com/en-us/azure/cognitive-services/luis/luis-migration-api-v3)**
+* Bot Framework SDK **[v4](https://github.com/microsoft/botframework-sdk)**
 
 ### Running as an Azure Function, requires:
 * Microsoft.NET.Sdk.Functions

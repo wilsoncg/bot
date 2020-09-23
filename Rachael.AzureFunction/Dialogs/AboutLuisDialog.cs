@@ -1,29 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Rachael.AzureFunction.Attributes;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Luis.Models;
-using Microsoft.Bot.Builder.Luis;
-using Microsoft.Bot.Connector;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Schema;
+using Bot.Builder.Community.Dialogs.Luis;
+using Bot.Builder.Community.Dialogs.Luis.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace Rachael.AzureFunction.Dialogs
 {
-    [RachaelLuisModel]
-    [Serializable]
     public class AboutLuisDialog : LuisDialog<object>
     {
-        public AboutLuisDialog() { }
-        public AboutLuisDialog(ILuisService service) : base(service) { }
+        public AboutLuisDialog(IConfiguration config)
+            : base(
+                  nameof(AboutLuisDialog), 
+                  new List<ILuisService>() { GetLuisService(config) }.ToArray())
+        {
+        }
+
+        static ILuisService GetLuisService(IConfiguration configuration)
+        {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            var luisModel = new RachaelLuisModelAttribute(configuration);
+            return new LuisService(luisModel);
+        }
 
         [LuisIntent("")]
-        public async Task None(IDialogContext context, LuisResult result)
+        public async Task<DialogTurnResult> None(DialogContext context, LuisResult result)
         {
             var intro = $"I'm Rachael.";
-            await context.PostAsync(intro);
+            await context.Context.SendActivityAsync(intro);
 
             var animationCard = new AnimationCard
             {
@@ -35,32 +49,31 @@ namespace Rachael.AzureFunction.Dialogs
                     }
                 }
             };
-            var gif = context.MakeMessage();
+            var gif = MessageFactory.Attachment(new List<Attachment>());
             gif.Attachments.Add(animationCard.ToAttachment());
-            await context.PostAsync(gif);
-
-            var more = "I can tell you more about me.";
-            await context.PostAsync(more);
-            context.Wait(MessageReceived);
+            await context.Context.SendActivityAsync(gif);
+            return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
         [LuisIntent("About.Incept")]
-        public async Task AboutIncept(IDialogContext context, LuisResult result)
+        public async Task<DialogTurnResult> AboutIncept(DialogContext context, LuisResult result)
         {
-            await context.PostAsync($"My incept date is May 26th 2017.");
+            await context.Context.SendActivityAsync($"My incept date is May 26th 2017.");
+            return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
         [LuisIntent("About.Model")]
-        public async Task AboutModel(IDialogContext context, LuisResult result)
+        public async Task<DialogTurnResult> AboutModel(DialogContext context, LuisResult result)
         {
-            await context.PostAsync($"I'm a Nexus 7, N7FAA52318. More human than human.");
+            await context.Context.SendActivityAsync($"I'm a Nexus 7, N7FAA52318. More human than human.");
+            return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
         [LuisIntent("About.Creator")]
-        public async Task AboutCreator(IDialogContext context, LuisResult result)
+        public async Task<DialogTurnResult> AboutCreator(DialogContext context, LuisResult result)
         {
             var creator = "I was created by Eldon Tyrell.";
-            await context.PostAsync(creator);
+            await context.Context.SendActivityAsync(creator);
             var createrHeroCard = new HeroCard
             {
                 Title = "Dr. Eldon Tyrell",
@@ -73,13 +86,14 @@ namespace Rachael.AzureFunction.Dialogs
                     new CardAction(ActionTypes.OpenUrl, "Find out more", value: "http://bladerunner.wikia.com/wiki/Eldon_Tyrell")
                 }
             };
-            var createrInfo = context.MakeMessage();
+            var createrInfo = MessageFactory.Attachment(new List<Attachment>());
             createrInfo.Attachments.Add(createrHeroCard.ToAttachment());
-            await context.PostAsync(createrInfo);
+            await context.Context.SendActivityAsync(createrInfo);
+            return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
         [LuisIntent("Fun.Brexit")]
-        public async Task FunBrexit(IDialogContext context, LuisResult result)
+        public async Task<DialogTurnResult> FunBrexit(DialogContext context, LuisResult result)
         {
             var transitionEnd = new DateTime(2020, 12, 31, 23, 59, 59);
             var untilEnd = transitionEnd.Subtract(DateTime.UtcNow);
@@ -88,7 +102,7 @@ namespace Rachael.AzureFunction.Dialogs
                 "the transition period has ended" :
                 $"there are {untilEnd.Days} days {untilEnd.Hours} hours, {untilEnd.Minutes} minutes and {untilEnd.Seconds} seconds until the transition period ends";
             var politics = $"I find politics is a waste of CPU cycles. However, {howLong}.";
-            await context.PostAsync(politics);
+            await context.Context.SendActivityAsync(politics);
 
             //if (context.Activity.ChannelId == "skype")
             //{
@@ -105,10 +119,11 @@ namespace Rachael.AzureFunction.Dialogs
                 var card = RenderTweetAsCardForSkype(tweet);
             //}
                         
-            var message = context.MakeMessage();
+            var message = MessageFactory.Attachment(new List<Attachment>());
             message.Text = "Here is a tweet you might find interesting:";
             message.Attachments.Add(card.ToAttachment());
-            await context.PostAsync(message);
+            await context.Context.SendActivityAsync(message);
+            return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
         class Tweet
@@ -136,9 +151,18 @@ namespace Rachael.AzureFunction.Dialogs
                 Buttons = new List<CardAction>
                 {
                     new CardAction(ActionTypes.OpenUrl, "View tweet",
-                        value: $"https://twitter.com/status/{tweet.Id}")
+                        value: $"https://twitter.com/{tweet.Username}/status/{tweet.Id}")
                 }
             };
+        }
+
+        protected override async Task<DialogTurnResult> OnContinueDialogAsync(
+            DialogContext innerDc, 
+            CancellationToken cancellationToken = default)
+        {
+            var childResult = await innerDc.ContinueDialogAsync(cancellationToken);
+            var result = childResult.Result as DialogTurnResult;
+            return await base.OnContinueDialogAsync(innerDc, cancellationToken);
         }
     }
 }

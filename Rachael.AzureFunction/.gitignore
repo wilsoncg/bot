@@ -6,6 +6,8 @@ home-work-response.json
 
 # Azure Functions localsettings file
 local.settings.json
+appsettings.json
+appsettings.*.json
 
 # User-specific files
 *.suo
