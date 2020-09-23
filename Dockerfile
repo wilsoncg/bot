@@ -5,6 +5,7 @@ FROM node:10-alpine
 RUN npm install -g @microsoft/botframework-cli@4.10.1
 
 ADD .docker/botframework-cli.config.json /root/.config/@microsoft/botframework-cli/config.json
+RUN ["mkdir", "/mnt/bfcli"]
 
 # Provdide a path to your cli apps executable
 # /usr/local/bin/bf -> /usr/local/lib/node_modules/@microsoft/botframework-cli/bin/run
