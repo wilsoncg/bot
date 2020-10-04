@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+    node:
+        image: node:10-alpine
+        container_name: node-bfcli
+        ports: 
+            - "4000:3000"
+        volumes: 
+            - .:/home/node/app
+        working_dir: /home/node/app            
+        command: 
+            - sh -c "npm install -g @microsoft/botframework-cli"
+            - sh -c "npm start"
