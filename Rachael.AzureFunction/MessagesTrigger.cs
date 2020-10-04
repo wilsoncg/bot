@@ -24,10 +24,12 @@ namespace Rachael.AzureFunction
     public class MessagesTrigger
     {
         readonly BotAdapter _botAdapter;
+        readonly IHttpClientFactory _factory;
         readonly IConfiguration _config;
 
-        public MessagesTrigger(IConfiguration config)
+        public MessagesTrigger(IHttpClientFactory factory, IConfiguration config)
         {
+            _factory = factory;
             _config = config;
             _botAdapter = 
                 new BotFrameworkAdapter(
@@ -84,7 +86,7 @@ namespace Rachael.AzureFunction
             if(turnContext.Activity.Type == ActivityTypes.Message)
             {
                 var state = turnContext.TurnState.Get<MessagesConversationState>(typeof(MessagesConversationState).FullName);
-                await new RootDialog(_config).Run(
+                await new RootDialog(_factory, _config).Run(
                     turnContext,
                     state.CreateProperty<DialogState>("DialogState"),
                     cancellationToken);

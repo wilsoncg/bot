@@ -19,7 +19,10 @@ namespace Rachael.AzureFunction
     public class Startup : FunctionsStartup
     {
         public override void Configure(IFunctionsHostBuilder builder)
-        {          
+        {
+            builder.Services
+                .AddSingleton<OAuthAuthenticationHeaderHandler>()
+                .AddTransient<IOAuthDetailsFactory>((sp) => new OAuthDetailsFactory());
             builder.Services
                 .AddHttpClient("Twitter", c => 
                 {
@@ -127,14 +130,13 @@ namespace Rachael.AzureFunction
                     data
                         .Where(kvp => kvp.Key.StartsWith("oauth_"))
                         .Select(kv => $"{Uri.EscapeDataString(kv.Key)}=\"{Uri.EscapeDataString(kv.Value)}\""));
-                        //.OrderBy(s => s));
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             request.Headers.TryGetValues("application/x-www-form-urlencoded", out var formContentType);
             var body =
-                formContentType.Any() ?
+                formContentType != null && formContentType.Any() ?
                 await request.Content.ReadAsFormDataAsync() :
                 new NameValueCollection();
             request.Headers.Add("Authorization", 
