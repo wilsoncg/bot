@@ -219,7 +219,7 @@ namespace Rachael.AzureFunction.Dialogs
                 var d = new Dictionary<string, string>()
                 {
                     { "tweet.fields", "attachments,entities,author_id,created_at" },
-                    { "expansions", "attachments.media_keys,author_id" },
+                    { "expansions", "attachments.media_keys,author_id,referenced_tweets.id" },
                     { "media.fields", "duration_ms,height,media_key,preview_image_url,type,url,width" },
                     { "user.fields", "profile_image_url" },
                 };
@@ -231,17 +231,18 @@ namespace Rachael.AzureFunction.Dialogs
                 var data = await response.Content.ReadAsStringAsync();
                 var json = JsonSerializer.Deserialize<JSonSingleTweet>(data);
 
+                var preview_url = json.includes.media?.First().preview_image_url;
                 return new List<Tweet>()
                 {
                     new Tweet
                     {
                         Id = json.data.id,
-                        Text = json.data.text,
+                        Text = json.Text(),
                         CreatedAt = DateTime.Parse(json.data.created_at),
-                        Username = json.includes.users[0].username,
-                        UserFriendlyName = json.includes.users[0].name,
-                        UserProfileImageUrl = json.includes.users[0].profile_image_url,
-                        PreviewImageUrl = json.includes.media[0].preview_image_url
+                        Username = json.includes.users[0]?.username,
+                        UserFriendlyName = json.includes.users[0]?.name,
+                        UserProfileImageUrl = json.includes.users[0]?.profile_image_url,
+                        PreviewImageUrl = preview_url
                     }
                 };
             }
@@ -250,6 +251,19 @@ namespace Rachael.AzureFunction.Dialogs
             {
                 public JsonSingleTweet_Data data { get; set; }
                 public JsonSingleTweet_Includes includes { get; set; }
+                public string Text()
+                {
+                    if(this.includes.tweets == null)
+                        return this.data.text;
+
+                    var referencedText = this.includes.tweets?.First().text ?? "";
+                    var dataText = this.data.text;
+
+                    if(referencedText.Length >= dataText.Length)
+                        return referencedText;
+                    
+                    return dataText;
+                }
             }
 
             class JsonSingleTweet_Data
@@ -263,6 +277,7 @@ namespace Rachael.AzureFunction.Dialogs
             {
                 public Tweet_Media[] media { get; set; }
                 public Tweet_Users[] users { get; set; }
+                public Tweet_Tweets[] tweets { get; set; }
             }
 
             class Tweet_Users
@@ -275,6 +290,11 @@ namespace Rachael.AzureFunction.Dialogs
             class Tweet_Media
             {
                 public string preview_image_url { get; set; }
+            }
+
+            class Tweet_Tweets 
+            {
+                public string text { get; set; }
             }
         }
 
