@@ -1,0 +1,5 @@
+{
+    "MSBuild": {
+        "MSBuildSDKsPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100"
+    }
+}
