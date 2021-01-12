@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 /Rachael.AzureFunction/Properties/PublishProfiles/RachaelAzureFunction - Web Deploy.pubxml
+
+.ionide

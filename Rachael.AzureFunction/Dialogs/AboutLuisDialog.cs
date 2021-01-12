@@ -103,36 +103,40 @@ namespace Rachael.AzureFunction.Dialogs
         {
             var transitionEnd = new DateTime(2020, 12, 31, 23, 59, 59);
             var untilEnd = transitionEnd.Subtract(DateTime.UtcNow);
+            var sinceTransition = DateTime.UtcNow.Subtract(transitionEnd);
             var howLong =
                 untilEnd.TotalSeconds < 0 ?
-                "the transition period has ended" :
-                $"there are {untilEnd.Days} days {untilEnd.Hours} hours, {untilEnd.Minutes} minutes and {untilEnd.Seconds} seconds until the transition period ends";
-            var politics = $"I find politics is a waste of CPU cycles. However, {howLong}.";
+                $"The transition period ended {sinceTransition.Days} days ago" :
+                $"There are {untilEnd.Days} days {untilEnd.Hours} hours, {untilEnd.Minutes} minutes and {untilEnd.Seconds} seconds until the transition period ends";
+            var politics = $"I find politics is a waste of CPU cycles. {howLong}.";
             await context.Context.SendActivityAsync(politics);
-
-            //if (context.Activity.ChannelId == "skype")
-            //{
-            /*var tweet = new Tweet
-            {
-                Id = "1302992864071356417",
-                Text = "A 7,500sq metre reminder of the words of Vote Leave leader Michael Gove.                                                                \n(South Gare beach, Redcar, September 2019) https://t.co/pnqyZA36MB",
-                CreatedAt = DateTime.Parse("2020 - 09 - 07T15: 31:21.000Z"),
-                PreviewImageUrl = "https://pbs.twimg.com/ext_tw_video_thumb/1302989543709249538/pu/img/kuhetq58tdgLYiau.jpg",
-                Username = "ByDonkeys",
-                UserFriendlyName = "Led By Donkeys",
-                UserProfileImageUrl = "https://pbs.twimg.com/profile_images/1085150433960706048/_T5T_iZY_normal.jpg"
-            };*/
+            
             var t = new Tweet(_factory);
-            var recent = await t.GetTweetIdsForUserId("1073606435580325889");
+            // var r = t.GetUserIdsForUsernames(new[] { "ByDonkeys", "BorisJohnson_MP" })
+            //     .Select(x => x);
+
+            var users = await t.GetUserIdsForUsernames(new[] { "ByDonkeys", "BorisJohnson_MP" });
+            var recentTweets = users.Select(async userId => { 
+                var ids = await t.GetTweetIdsForUserId(userId);
+                if(!ids.Any())
+                    return Enumerable.Empty<string>();
+
+                return ids.Take(1);
+            });
+
+            // IEnumerable<string>[] = IEnumerable<Task<IEnumerable<string>>>
+            var recent = (await Task.WhenAll(recentTweets)).SelectMany(x => x);
             if (!recent.Any())
                 return new DialogTurnResult(DialogTurnStatus.Complete);
 
-            var tweets = await t.GetByTweetId(recent.First());
-            var card = RenderTweetAsCardForSkype(tweets.First());
-                        
+            var cards = 
+                (await Task.WhenAll(recent.Select(t.GetByTweetId)))
+                .SelectMany(x => x)
+                .Select(RenderTweetAsCardForSkype);
+                                    
             var message = MessageFactory.Attachment(new List<Attachment>());
-            message.Text = "Here is a tweet you might find interesting:";
-            message.Attachments.Add(card.ToAttachment());
+            message.Text = "Here are tweets you might find interesting:";
+            message.Attachments = cards.Select(card => card.ToAttachment()).ToList();
             await context.Context.SendActivityAsync(message);
             return new DialogTurnResult(DialogTurnStatus.Complete);
         }
@@ -158,9 +162,31 @@ namespace Rachael.AzureFunction.Dialogs
             public string UserFriendlyName { get; set; }
             public string UserProfileImageUrl { get; set; }
 
-            public async Task<IEnumerable<long>> GetTweetIdsForUserId(string userId)
+            public async Task<IEnumerable<string>> GetUserIdsForUsernames(IEnumerable<string> usernames)
             {
+                var client = _factory.CreateClient("Twitter");
+                var d =
+                    new Dictionary<string, string>()
+                    {
+                        { "usernames", String.Join(",", usernames) }
+                    };
+                var query = string.Join("&", d.Select(kv => $"{kv.Key}={kv.Value}"));
+                var response = await client.GetAsync($"2/users/by?{query}");
+                if (!response.IsSuccessStatusCode)
+                    return new List<string>();
 
+                var data = await response.Content.ReadAsStringAsync();
+                var json = JsonSerializer.Deserialize<JsonListUsersByUsernameData>(data);
+
+                var items =
+                    json == null ?
+                        new List<string>() :
+                        json.data.Select(x => x.id);
+                return items;
+            }
+
+            public async Task<IEnumerable<string>> GetTweetIdsForUserId(string userId)
+            {
                 var client = _factory.CreateClient("Twitter");
                 var d =
                     new Dictionary<string, string>()
@@ -171,21 +197,23 @@ namespace Rachael.AzureFunction.Dialogs
                 var query = string.Join("&", d.Select(kv => $"{kv.Key}={kv.Value}"));
                 var response = await client.GetAsync($"1.1/statuses/user_timeline.json?{query}");
                 if (!response.IsSuccessStatusCode)
-                    return new List<long>();
+                    return new List<string>();
 
                 var data = await response.Content.ReadAsStringAsync();
                 var json = JsonSerializer.Deserialize<JsonTimelineData[]>(data);
 
                 var items =
                     json == null ?
-                        new List<long>() :
-                        json.Select(x => x.id);
+                        new List<string>() :
+                        json.Select(x => x.id_str);
                 return items;
             }
 
-            public class JsonTimelineData { public long id { get; set; } }
+            public class JsonTimelineData { public string id_str { get; set; } }
+            public class JsonUsersByUsernameData { public string id { get; set; } }
+            public class JsonListUsersByUsernameData { public JsonUsersByUsernameData[] data { get; set; } }
 
-            public async Task<IList<Tweet>> GetByTweetId(long tweetId)
+            public async Task<IList<Tweet>> GetByTweetId(string tweetId)
             {
                 var client = _factory.CreateClient("Twitter");
                 var d = new Dictionary<string, string>()
