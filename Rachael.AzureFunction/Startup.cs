@@ -21,7 +21,7 @@ namespace Rachael.AzureFunction
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services
-                .AddSingleton<OAuthAuthenticationHeaderHandler>()
+                .AddTransient<OAuthAuthenticationHeaderHandler>()
                 .AddTransient<IOAuthDetailsFactory>((sp) => new OAuthDetailsFactory());
             builder.Services
                 .AddHttpClient("Twitter", c => 
