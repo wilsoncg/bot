@@ -2,7 +2,7 @@
   "profiles": {
     "Rachael.AzureFunction": {
       "commandName": "Project",
-      "commandLineArgs": "host start --csharp",
+      "commandLineArgs": "func host start --csharp",
       "workingDirectory": "$(TargetDir)"
     }
   }
