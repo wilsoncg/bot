@@ -29,6 +29,10 @@ namespace Rachael.AzureFunction
                     c.BaseAddress = new Uri("https://api.twitter.com/");
                 })
                 .AddHttpMessageHandler<OAuthAuthenticationHeaderHandler>();
+            builder.Services
+                .AddHttpClient("BotFramework", c => {
+                    c.BaseAddress = new Uri("https://directline.botframework.com/");
+                });
         }
 
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
