@@ -1,0 +1,67 @@
+{
+    "data": {
+        "entities": {
+            "urls": [
+                {
+                    "start": 180,
+                    "end": 203,
+                    "url": "https://t.co/pnqyZA36MB",
+                    "expanded_url": "https://twitter.com/ByDonkeys/status/1302992864071356417/video/1",
+                    "display_url": "pic.twitter.com/pnqyZA36MB"
+                }
+            ],
+            "annotations": [
+                {
+                    "start": 59,
+                    "end": 70,
+                    "probability": 0.971,
+                    "type": "Person",
+                    "normalized_text": "Michael Gove"
+                },
+                {
+                    "start": 138,
+                    "end": 153,
+                    "probability": 0.5388,
+                    "type": "Place",
+                    "normalized_text": "South Gare beach"
+                },
+                {
+                    "start": 156,
+                    "end": 161,
+                    "probability": 0.8717,
+                    "type": "Place",
+                    "normalized_text": "Redcar"
+                }
+            ]
+        },
+        "attachments": {
+            "media_keys": [
+                "7_1302989543709249538"
+            ]
+        },
+        "text": "A 7,500sq metre reminder of the words of Vote Leave leader Michael Gove.                                                                \n(South Gare beach, Redcar, September 2019) https://t.co/pnqyZA36MB",
+        "id": "1302992864071356417",
+        "created_at": "2020-09-07T15:31:21.000Z",
+        "author_id": "1073606435580325889"
+    },
+    "includes": {
+        "media": [
+            {
+                "media_key": "7_1302989543709249538",
+                "height": 720,
+                "preview_image_url": "https://pbs.twimg.com/ext_tw_video_thumb/1302989543709249538/pu/img/kuhetq58tdgLYiau.jpg",
+                "type": "video",
+                "duration_ms": 44640,
+                "width": 1280
+            }
+        ],
+        "users": [
+            {
+                "id": "1073606435580325889",
+                "username": "ByDonkeys",
+                "profile_image_url": "https://pbs.twimg.com/profile_images/1085150433960706048/_T5T_iZY_normal.jpg",
+                "name": "Led By Donkeys"
+            }
+        ]
+    }
+}
