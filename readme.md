@@ -6,6 +6,8 @@ Features:
 * Running on a consumption model as an Azure function **[v3.x](https://docs.microsoft.com/en-us/azure/azure-functions/functions-versions)**
 * Connected to the [LUIS](https://eu.luis.ai) language understanding service **[v2.0](https://docs.microsoft.com/en-us/azure/cognitive-services/luis/luis-migration-api-v3)**
 * Bot Framework SDK **[v4](https://github.com/microsoft/botframework-sdk)**
+* Connected to twitter API **[v2](https://developer.twitter.com/en/docs/twitter-api/early-access)**
+* Custom OAuth [ASP.NET DelegatingHandler](https://docs.microsoft.com/en-us/aspnet/web-api/overview/advanced/http-message-handlers)
 
 ### Running as an Azure Function, requires:
 * Microsoft.NET.Sdk.Functions
@@ -17,7 +19,8 @@ docker build -t wilsoncg/bf-cli .
 docker run wilsoncg/bf-cli luis
 ```
 
-Here you can see Rachael in the bot emulator:
+Here you can see Rachael in the bot framework emulator [v4](https://github.com/Microsoft/BotFramework-Emulator):
+
 ![Rachael running in the emulator](rachael-emulator.png)
 
 Useful links:
