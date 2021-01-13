@@ -10,11 +10,9 @@ using Newtonsoft.Json;
 
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Bot.Configuration;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector.Authentication;
-using System.Configuration;
 using System.Security.Claims;
 using Rachael.AzureFunction.Dialogs;
 using Microsoft.Extensions.Configuration;
@@ -37,14 +35,6 @@ namespace Rachael.AzureFunction
                         config.GetValue<string>("MicrosoftAppId"),
                         config.GetValue<string>("MicrosoftAppPassword")))
                 .UseBotState(new MessagesConversationState());
-        }
-
-        class Bot : IBot
-        {
-            public Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
-            {
-                return null;
-            }
         }
 
         sealed class MessagesConversationState : ConversationState
