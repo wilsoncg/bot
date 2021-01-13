@@ -1,2 +1,11 @@
 {
+  "version": "2.0",
+  "functionTimeout": "00:05:00",
+  "extensions": {
+    "http": {
+      "routePrefix": "api",
+      "maxConcurrentRequests": 10,
+      "maxOutstandingRequests": 30
+    }
+  }
 }
