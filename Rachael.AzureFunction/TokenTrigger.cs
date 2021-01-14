@@ -29,7 +29,7 @@ namespace Rachael.AzureFunction
 
         [FunctionName("Token")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]
             HttpRequestMessage req, 
             ILogger log,
             CancellationToken hostCancellationToken)
