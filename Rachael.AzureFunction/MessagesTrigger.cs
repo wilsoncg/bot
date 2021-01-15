@@ -22,19 +22,19 @@ namespace Rachael.AzureFunction
 {
     public class MessagesTrigger
     {
-        readonly BotAdapter _botAdapter;
+        readonly BotFrameworkAdapter _botAdapter;
         readonly IHttpClientFactory _factory;
         readonly IConfiguration _config;
         readonly ClaimsIdentity _claimsIdentity;
 
-        public MessagesTrigger(IHttpClientFactory factory, IConfiguration config)
+        public MessagesTrigger(
+            IHttpClientFactory factory, 
+            IConfiguration config,
+            ICredentialProvider credentialProvider,
+            BotFrameworkAdapter adapter)
         {
             _factory = factory;
             _config = config;
-            var simpleCredential =
-                new SimpleCredentialProvider(
-                        config.GetValue<string>("MicrosoftAppId"),
-                        config.GetValue<string>("MicrosoftAppPassword"));
             _claimsIdentity = new ClaimsIdentity(
                 new List<Claim> {
                     new Claim("appid", config.GetValue<string>("MicrosoftAppId")),
@@ -42,17 +42,7 @@ namespace Rachael.AzureFunction
                     new Claim("ver", "1.0")
                 }
             );
-            _botAdapter = new BotFrameworkAdapter(simpleCredential)
-                .UseBotState(new MessagesConversationState());
-        }
-
-        sealed class MessagesConversationState : ConversationState
-        {
-            public MessagesConversationState() : base(new MemoryStorage())
-            {
-            }
-
-            public int TurnNumber { get; set; }
+            _botAdapter = adapter;
         }
 
         [FunctionName("Messages")]
@@ -102,7 +92,7 @@ namespace Rachael.AzureFunction
         {
             if(turnContext.Activity.Type == ActivityTypes.Message)
             {
-                var state = turnContext.TurnState.Get<MessagesConversationState>(typeof(MessagesConversationState).FullName);
+                var state = turnContext.TurnState.Get<ConversationState>(typeof(ConversationState).FullName);
                 await new RootDialog(_factory, _config).Run(
                     turnContext,
                     state.CreateProperty<DialogState>("DialogState"),
