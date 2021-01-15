@@ -29,11 +29,11 @@ namespace Rachael.AzureFunction
         {
             _factory = factory;
             _config = config;
-            _botAdapter = 
-                new BotFrameworkAdapter(
-                    new SimpleCredentialProvider(
+            var simpleCredential =
+                new SimpleCredentialProvider(
                         config.GetValue<string>("MicrosoftAppId"),
-                        config.GetValue<string>("MicrosoftAppPassword")))
+                        config.GetValue<string>("MicrosoftAppPassword"));
+            _botAdapter = new BotFrameworkAdapter(simpleCredential)
                 .UseBotState(new MessagesConversationState());
         }
 
@@ -56,6 +56,25 @@ namespace Rachael.AzureFunction
             log.LogInformation("Messages function triggered.");
 
             var jsonContent = await req.Content.ReadAsStringAsync();
+            var claimsHeaders = 
+                req.Headers
+                .Where(x => 
+                    (x.Key.ToUpper() == "X-MS-CLIENT-PRINCIPAL-NAME") ||
+                    (x.Key.ToUpper() == "X-MS-CLIENT-PRINCIPAL-ID"))
+                .Select(y => $"Header[${y.Key},{y.Value}]")
+                .Aggregate(
+                    new System.Text.StringBuilder(),
+                    (a, s) => a.Append(s))
+                .ToString();
+            if(string.IsNullOrEmpty(claimsHeaders))
+            {
+                log.LogInformation($"ClaimsPrincipal headers: <empty>");
+            }
+            else
+            {
+                log.LogInformation($"ClaimsPrincipal headers: {claimsHeaders}");
+            }            
+
             var activity = JsonConvert.DeserializeObject<Activity>(jsonContent);
             var claimsIdentity = new ClaimsIdentity();
             try
