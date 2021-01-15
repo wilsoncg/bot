@@ -16,6 +16,7 @@ using Microsoft.Bot.Connector.Authentication;
 using System.Security.Claims;
 using Rachael.AzureFunction.Dialogs;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace Rachael.AzureFunction
 {
@@ -24,6 +25,7 @@ namespace Rachael.AzureFunction
         readonly BotAdapter _botAdapter;
         readonly IHttpClientFactory _factory;
         readonly IConfiguration _config;
+        readonly ClaimsIdentity _claimsIdentity;
 
         public MessagesTrigger(IHttpClientFactory factory, IConfiguration config)
         {
@@ -33,6 +35,13 @@ namespace Rachael.AzureFunction
                 new SimpleCredentialProvider(
                         config.GetValue<string>("MicrosoftAppId"),
                         config.GetValue<string>("MicrosoftAppPassword"));
+            _claimsIdentity = new ClaimsIdentity(
+                new List<Claim> {
+                    new Claim("appid", config.GetValue<string>("MicrosoftAppId")),
+                    new Claim("aud", config.GetValue<string>("MicrosoftAppId")),
+                    new Claim("ver", "1.0")
+                }
+            );
             _botAdapter = new BotFrameworkAdapter(simpleCredential)
                 .UseBotState(new MessagesConversationState());
         }
@@ -76,10 +85,9 @@ namespace Rachael.AzureFunction
             }            
 
             var activity = JsonConvert.DeserializeObject<Activity>(jsonContent);
-            var claimsIdentity = new ClaimsIdentity();
             try
             {
-                var response = await _botAdapter.ProcessActivityAsync(claimsIdentity, activity, BotLogic, hostCancellationToken);
+                var response = await _botAdapter.ProcessActivityAsync(_claimsIdentity, activity, BotLogic, hostCancellationToken);
             }
             catch (Exception ex)
             {
