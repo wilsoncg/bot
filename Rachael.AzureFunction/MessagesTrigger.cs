@@ -59,7 +59,9 @@ namespace Rachael.AzureFunction
                 req.Headers
                 .Where(x => 
                     (x.Key.ToUpper() == "X-MS-CLIENT-PRINCIPAL-NAME") ||
-                    (x.Key.ToUpper() == "X-MS-CLIENT-PRINCIPAL-ID"))
+                    (x.Key.ToUpper() == "X-MS-CLIENT-PRINCIPAL-ID") || 
+                    (x.Key.ToUpper() == "Authorization") ||
+                    (x.Key.ToUpper() == "Authentication"))
                 .Select(y => $"Header[${y.Key},{y.Value}]")
                 .Aggregate(
                     new System.Text.StringBuilder(),
