@@ -25,7 +25,6 @@ namespace Rachael.AzureFunction
         readonly BotFrameworkAdapter _botAdapter;
         readonly IHttpClientFactory _factory;
         readonly IConfiguration _config;
-        readonly ClaimsIdentity _claimsIdentity;
 
         public MessagesTrigger(
             IHttpClientFactory factory, 
@@ -45,7 +44,7 @@ namespace Rachael.AzureFunction
             ILogger log,
             CancellationToken hostCancellationToken)
         {
-            log.LogInformation("Messages function triggered.");
+            log.LogInformation("Messages function triggered.");            
 
             var jsonContent = await req.Content.ReadAsStringAsync();
 
@@ -57,6 +56,7 @@ namespace Rachael.AzureFunction
                     .SelectMany(x => x)
                 );
             var activity = JsonConvert.DeserializeObject<Activity>(jsonContent);
+            log.LogInformation($"ChannelId: {activity.ChannelId}");
             try
             {
                 var response = await _botAdapter.ProcessActivityAsync(authHeader, activity, BotLogic, hostCancellationToken);

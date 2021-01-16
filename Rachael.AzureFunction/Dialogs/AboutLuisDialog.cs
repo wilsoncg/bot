@@ -13,6 +13,11 @@ using Microsoft.Extensions.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using TextJsonSerializer = System.Text.Json.JsonSerializer;
+using System.IO;
+using Newtonsoft.Json;
+using AdaptiveCards;
+using AdaptiveCards.Templating;
 
 namespace Rachael.AzureFunction.Dialogs
 {
@@ -128,10 +133,11 @@ namespace Rachael.AzureFunction.Dialogs
             if (!recent.Any())
                 return new DialogTurnResult(DialogTurnStatus.Complete);
 
-            var cards = 
+            var attachments = 
                 (await Task.WhenAll(recent.Select(t.GetByTweetId)))
                 .SelectMany(x => x)
-                .Select(RenderTweetAsCardForSkype);            
+                .Select(x => RenderTweetAsCard(context, x))
+                .ToList();            
 
             await context.Context.SendActivitiesAsync(
                 new Activity[] {
@@ -139,10 +145,22 @@ namespace Rachael.AzureFunction.Dialogs
                     new Activity { 
                         Type = ActivityTypes.Message, 
                         Text = "Here are some tweets you might find interesting:", 
-                        Attachments = cards.Select(card => card.ToAttachment()).ToList()}
+                        Attachments = attachments 
+                    }
                 });
 
             return new DialogTurnResult(DialogTurnStatus.Complete);
+        }
+
+        Attachment RenderTweetAsCard(DialogContext context, Tweet tweet)
+        {
+            if(context.Context.Activity.ChannelId.ToLower() == "emulator" ||
+                context.Context.Activity.ChannelId.ToLower() == "web chat")
+            {
+                return RenderTweetAsAdaptiveCard(tweet);
+            }
+
+            return RenderTweetAsHeroCard(tweet).ToAttachment();
         }
 
         class Tweet
@@ -161,6 +179,7 @@ namespace Rachael.AzureFunction.Dialogs
             public string Id { get; set; }
             public string Text { get; set; }
             public DateTime CreatedAt { get; set; }
+            public string CreatedAtDisplayString => CreatedAt.ToString("HH:mm - dd MMM yyyy");
             public string PreviewImageUrl { get; set; }
             public string Username { get; set; }
             public string UserFriendlyName { get; set; }
@@ -180,7 +199,7 @@ namespace Rachael.AzureFunction.Dialogs
                     return new List<string>();
 
                 var data = await response.Content.ReadAsStringAsync();
-                var json = JsonSerializer.Deserialize<JsonListUsersByUsernameData>(data);
+                var json = TextJsonSerializer.Deserialize<JsonListUsersByUsernameData>(data);
 
                 var items =
                     json == null ?
@@ -204,7 +223,7 @@ namespace Rachael.AzureFunction.Dialogs
                     return new List<string>();
 
                 var data = await response.Content.ReadAsStringAsync();
-                var json = JsonSerializer.Deserialize<JsonTimelineData[]>(data);
+                var json = TextJsonSerializer.Deserialize<JsonTimelineData[]>(data);
 
                 var items =
                     json == null ?
@@ -233,7 +252,7 @@ namespace Rachael.AzureFunction.Dialogs
                     return new List<Tweet>();
 
                 var data = await response.Content.ReadAsStringAsync();
-                var json = JsonSerializer.Deserialize<JSonSingleTweet>(data);
+                var json = TextJsonSerializer.Deserialize<JSonSingleTweet>(data);
 
                 var preview_url = json.includes.media?.First().preview_image_url;
                 return new List<Tweet>()
@@ -302,7 +321,7 @@ namespace Rachael.AzureFunction.Dialogs
             }
         }
 
-        private HeroCard RenderTweetAsCardForSkype(Tweet tweet)
+        private HeroCard RenderTweetAsHeroCard(Tweet tweet)
         {
             var month = tweet.CreatedAt.ToString("MMM");
             return new HeroCard
@@ -319,6 +338,27 @@ namespace Rachael.AzureFunction.Dialogs
                         value: $"https://twitter.com/{tweet.Username}/status/{tweet.Id}")
                 }
             };
+        }
+
+        Attachment RenderTweetAsAdaptiveCard(Tweet tweet)
+        {
+            var cardResourcePath = $"Rachael.AzureFunction.Cards.twitter-adaptive-card-schema-1.2.json";
+
+            using (var stream = typeof(Rachael.AzureFunction.Dialogs.AboutLuisDialog).Assembly.GetManifestResourceStream(cardResourcePath))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    var templateJson = reader.ReadToEnd();
+                    var template = new AdaptiveCardTemplate(templateJson);
+                    var cardJson = template.Expand(tweet);
+
+                    return new Attachment()
+                    {
+                        ContentType = "application/vnd.microsoft.card.adaptive",
+                        Content = JsonConvert.DeserializeObject(cardJson),
+                    };
+                }
+            }
         }
 
         protected override async Task<DialogTurnResult> OnContinueDialogAsync(
