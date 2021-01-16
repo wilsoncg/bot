@@ -35,13 +35,6 @@ namespace Rachael.AzureFunction
         {
             _factory = factory;
             _config = config;
-            _claimsIdentity = new ClaimsIdentity(
-                new List<Claim> {
-                    new Claim("appid", config.GetValue<string>("MicrosoftAppId")),
-                    new Claim("aud", config.GetValue<string>("MicrosoftAppId")),
-                    new Claim("ver", "1.0")
-                }
-            );
             _botAdapter = adapter;
         }
 
@@ -55,31 +48,18 @@ namespace Rachael.AzureFunction
             log.LogInformation("Messages function triggered.");
 
             var jsonContent = await req.Content.ReadAsStringAsync();
-            var claimsHeaders = 
-                req.Headers
-                .Where(x => 
-                    (x.Key.ToUpper() == "X-MS-CLIENT-PRINCIPAL-NAME") ||
-                    (x.Key.ToUpper() == "X-MS-CLIENT-PRINCIPAL-ID") || 
-                    (x.Key.ToUpper() == "Authorization") ||
-                    (x.Key.ToUpper() == "Authentication"))
-                .Select(y => $"Header[${y.Key},{y.Value}]")
-                .Aggregate(
-                    new System.Text.StringBuilder(),
-                    (a, s) => a.Append(s))
-                .ToString();
-            if(string.IsNullOrEmpty(claimsHeaders))
-            {
-                log.LogInformation($"ClaimsPrincipal headers: <empty>");
-            }
-            else
-            {
-                log.LogInformation($"ClaimsPrincipal headers: {claimsHeaders}");
-            }            
 
+            var authHeader = 
+                String.Join(' ',
+                    req.Headers
+                    .Where(x => (x.Key.ToUpper() == "AUTHORIZATION"))
+                    .Select(x => x.Value)
+                    .SelectMany(x => x)
+                );
             var activity = JsonConvert.DeserializeObject<Activity>(jsonContent);
             try
             {
-                var response = await _botAdapter.ProcessActivityAsync(_claimsIdentity, activity, BotLogic, hostCancellationToken);
+                var response = await _botAdapter.ProcessActivityAsync(authHeader, activity, BotLogic, hostCancellationToken);
             }
             catch (Exception ex)
             {
