@@ -106,10 +106,9 @@ namespace Rachael.AzureFunction.Dialogs
             var sinceTransition = DateTime.UtcNow.Subtract(transitionEnd);
             var howLong =
                 untilEnd.TotalSeconds < 0 ?
-                $"The transition period ended {sinceTransition.Days} days ago" :
+                $"The Brexit transition period ended {sinceTransition.Days} days ago" :
                 $"There are {untilEnd.Days} days {untilEnd.Hours} hours, {untilEnd.Minutes} minutes and {untilEnd.Seconds} seconds until the transition period ends";
             var politics = $"I find politics is a waste of CPU cycles. {howLong}.";
-            await context.Context.SendActivityAsync(politics);
             
             var t = new Tweet(_factory);
             // var r = t.GetUserIdsForUsernames(new[] { "ByDonkeys", "BorisJohnson_MP" })
@@ -132,12 +131,17 @@ namespace Rachael.AzureFunction.Dialogs
             var cards = 
                 (await Task.WhenAll(recent.Select(t.GetByTweetId)))
                 .SelectMany(x => x)
-                .Select(RenderTweetAsCardForSkype);
-                                    
-            var message = MessageFactory.Attachment(new List<Attachment>());
-            message.Text = "Here are tweets you might find interesting:";
-            message.Attachments = cards.Select(card => card.ToAttachment()).ToList();
-            await context.Context.SendActivityAsync(message);
+                .Select(RenderTweetAsCardForSkype);            
+
+            await context.Context.SendActivitiesAsync(
+                new Activity[] {
+                    MessageFactory.Text(politics),
+                    new Activity { 
+                        Type = ActivityTypes.Message, 
+                        Text = "Here are some tweets you might find interesting:", 
+                        Attachments = cards.Select(card => card.ToAttachment()).ToList()}
+                });
+
             return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
