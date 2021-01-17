@@ -3,6 +3,7 @@
 ![Rachael](rachael-icon.png)
 
 ## Features:
+* .NET Core [3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
 * Running on a consumption model as an Azure serverless function **[v3.x](https://docs.microsoft.com/en-us/azure/azure-functions/functions-versions)**
 * Connected to the [LUIS](https://eu.luis.ai) language understanding service **[v2.0](https://docs.microsoft.com/en-us/azure/cognitive-services/luis/luis-migration-api-v3)**
 * Bot Framework SDK **[v4](https://github.com/microsoft/botframework-sdk)**
