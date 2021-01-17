@@ -12,15 +12,16 @@
 * Uses Adaptive cards **[v1.2](https://adaptivecards.io/designer/)** for web chat
 
 ### Running as an Azure Function, requires:
-* Microsoft.NET.Sdk.Functions
-* Microsoft.Bot.Build.Azure
+* Microsoft.NET.Sdk.Functions - [Azure Functions docs](https://docs.microsoft.com/en-us/azure/azure-functions/)
+* Microsoft.Bot.Builder.Azure - [Bot Framework SDK docs](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0)
 
-### Run botframework-cli locally
+### Run botframework-cli tools locally
 ```
 docker build -t wilsoncg/bf-cli .
 docker run wilsoncg/bf-cli luis
 ```
 
+### Bot Framework Emulator application
 Here you can see Rachael in the bot framework emulator [v4](https://github.com/Microsoft/BotFramework-Emulator):
 
 ![Rachael running in the emulator](rachael-emulator.png)
@@ -38,8 +39,8 @@ Adaptive cards are only supported in certain channels. We therefore render tweet
 
 ## Useful links:
 
-* Bot Framework SDK https://github.com/microsoft/botframework-sdk/blob/master/README.md
-* Bot Framework SDK docs https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0
+* Bot Framework SDK repo https://github.com/microsoft/botframework-sdk/blob/master/README.md
+* Microsoft.Bot.Builder.* packages & repo https://github.com/microsoft/botbuilder-dotnet/
 * To learn how to debug Azure Bot Service bots, please visit https://aka.ms/bf-docs-azure-debug
 * Full list of app settings variables: https://docs.microsoft.com/en-gb/azure/azure-functions/functions-app-settings
 * Azure functions authentication/keys https://github.com/Azure/azure-functions-host/wiki/Http-Functions
