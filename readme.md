@@ -38,12 +38,28 @@ Adaptive cards are only supported in certain channels. We therefore render tweet
 
 ## Useful links:
 
-* To get started https://blogs.msdn.microsoft.com/webdev/2017/05/10/azure-function-tools-for-visual-studio-2017/
+* Bot Framework SDK https://github.com/microsoft/botframework-sdk/blob/master/README.md
+* Bot Framework SDK docs https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0
 * To learn how to debug Azure Bot Service bots, please visit https://aka.ms/bf-docs-azure-debug
+* Full list of app settings variables: https://docs.microsoft.com/en-gb/azure/azure-functions/functions-app-settings
+* Azure functions authentication/keys https://github.com/Azure/azure-functions-host/wiki/Http-Functions
+* Adaptive cards SDK https://docs.microsoft.com/en-us/adaptive-cards/sdk/authoring-cards/net
+
+## Portal links:
+
 * Microsoft applications: https://apps.dev.microsoft.com
 * LUIS applications: https://eu.luis.ai/applications/
 * Bot framework: https://dev.botframework.com/bots
 * Resources viewer: https://resources.azure.com
-* Full list of app settings variables: https://docs.microsoft.com/en-gb/azure/azure-functions/functions-app-settings
-* Azure functions authentication/keys https://github.com/Azure/azure-functions-host/wiki/Http-Functions
-* Adaptive cards SDK https://docs.microsoft.com/en-us/adaptive-cards/sdk/authoring-cards/net
+
+## Azure functions (Getting help):
+* [Azure Functions Documentation](https://azure.microsoft.com/en-us/documentation/articles/functions-reference/)
+* [Azure Functions MSDN forum](https://social.msdn.microsoft.com/Forums/en-US/home?forum=AzureFunctions)
+* [Azure Functions on Stack Overflow](http://stackoverflow.com/questions/tagged/azure-functions)
+* [Azure Functions host wiki](https://github.com/Azure/azure-functions-host/wiki)
+* [Reporting issues](https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference#reporting-issues)
+
+## Old links:
+
+* Azure function tools for Visual Studio 2017: https://devblogs.microsoft.com/aspnet/visual-studio-tools-for-azure-functions/
+* Azure function tools roadmap 2017: https://devblogs.microsoft.com/aspnet/azure-functions-tools-roadmap/
