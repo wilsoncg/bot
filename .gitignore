@@ -5,6 +5,7 @@
 local.settings.json
 # Bot framework emulator
 *.bot
+*-publishprofile.xml
 
 # User-specific files
 *.suo
