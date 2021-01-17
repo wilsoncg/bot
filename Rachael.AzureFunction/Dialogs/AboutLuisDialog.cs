@@ -329,10 +329,13 @@ namespace Rachael.AzureFunction.Dialogs
             {
                 Title = $"{tweet.UserFriendlyName} @{tweet.Username} - {month} {tweet.CreatedAt.Day}",
                 Text = tweet.Text,
-                Images = new List<CardImage>
-                {
-                    new CardImage($"{tweet.PreviewImageUrl}")
-                },
+                Images = 
+                    string.IsNullOrEmpty(tweet.PreviewImageUrl) ?
+                    null :
+                    new List<CardImage>
+                    {
+                        new CardImage($"{tweet.PreviewImageUrl}")
+                    },
                 Buttons = new List<CardAction>
                 {
                     new CardAction(ActionTypes.OpenUrl, "View tweet",
