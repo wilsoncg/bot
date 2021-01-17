@@ -133,29 +133,30 @@ namespace Rachael.AzureFunction.Dialogs
             if (!recent.Any())
                 return new DialogTurnResult(DialogTurnStatus.Complete);
 
-            var attachments = 
+            var tweets = 
                 (await Task.WhenAll(recent.Select(t.GetByTweetId)))
                 .SelectMany(x => x)
                 .Select(x => RenderTweetAsCard(context, x))
-                .ToList();            
+                .Select(x => MessageFactory.Attachment(x))
+                .ToArray();
 
             await context.Context.SendActivitiesAsync(
                 new Activity[] {
                     MessageFactory.Text(politics),
-                    new Activity { 
-                        Type = ActivityTypes.Message, 
-                        Text = "Here are some tweets you might find interesting:", 
-                        Attachments = attachments 
-                    }
+                    MessageFactory.Text("Here are some tweets you might find interesting:")
                 });
+            await context.Context.SendActivitiesAsync(tweets);
 
             return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
         Attachment RenderTweetAsCard(DialogContext context, Tweet tweet)
         {
-            if(context.Context.Activity.ChannelId.ToLower() == "emulator" ||
-                context.Context.Activity.ChannelId.ToLower() == "web chat")
+            if(context.Context.Activity.From.Id.ToLower().CompareTo("forcehero") == 0)
+                return RenderTweetAsHeroCard(tweet).ToAttachment();
+
+            if((context.Context.Activity.ChannelId.ToLower().CompareTo("emulator") == 0) ||
+                (context.Context.Activity.ChannelId.ToLower().CompareTo("web chat") == 0))
             {
                 return RenderTweetAsAdaptiveCard(tweet);
             }
