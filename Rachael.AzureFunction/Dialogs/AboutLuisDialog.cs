@@ -156,7 +156,7 @@ namespace Rachael.AzureFunction.Dialogs
                 return RenderTweetAsHeroCard(tweet).ToAttachment();
 
             if((context.Context.Activity.ChannelId.ToLower().CompareTo("emulator") == 0) ||
-                (context.Context.Activity.ChannelId.ToLower().CompareTo("web chat") == 0))
+                (context.Context.Activity.ChannelId.ToLower().CompareTo("webchat") == 0))
             {
                 return RenderTweetAsAdaptiveCard(tweet);
             }
