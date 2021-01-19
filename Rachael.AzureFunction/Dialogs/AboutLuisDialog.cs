@@ -181,7 +181,11 @@ namespace Rachael.AzureFunction.Dialogs
             public string Text { get; set; }
             public DateTime CreatedAt { get; set; }
             public string CreatedAtDisplayString => CreatedAt.ToString("HH:mm - dd MMM yyyy");
-            public string PreviewImageUrl { get; set; }
+            public IList<string> PreviewImageUrls { get; set; }
+            public IList<ImageSet_Image> PreviewImages => 
+                PreviewImageUrls
+                .Select(x => new ImageSet_Image { url = x })
+                .ToList();
             public string Username { get; set; }
             public string UserFriendlyName { get; set; }
             public string UserProfileImageUrl { get; set; }
@@ -255,7 +259,10 @@ namespace Rachael.AzureFunction.Dialogs
                 var data = await response.Content.ReadAsStringAsync();
                 var json = TextJsonSerializer.Deserialize<JSonSingleTweet>(data);
 
-                var preview_url = json.includes.media?.First().preview_image_url;
+                var preview_urls = 
+                    json.includes.media == null ?
+                        new List<string>() :
+                        json.includes.media.Select(x => x.preview_image_url).ToList();
                 return new List<Tweet>()
                 {
                     new Tweet
@@ -266,7 +273,7 @@ namespace Rachael.AzureFunction.Dialogs
                         Username = json.includes.users[0]?.username,
                         UserFriendlyName = json.includes.users[0]?.name,
                         UserProfileImageUrl = json.includes.users[0]?.profile_image_url,
-                        PreviewImageUrl = preview_url
+                        PreviewImageUrls = preview_urls
                     }
                 };
             }
@@ -320,6 +327,12 @@ namespace Rachael.AzureFunction.Dialogs
             {
                 public string text { get; set; }
             }
+
+            public class ImageSet_Image
+            {
+                public string @Type { get { return "Image";} }
+                public string url {get; set;}
+            }
         }
 
         private HeroCard RenderTweetAsHeroCard(Tweet tweet)
@@ -330,12 +343,9 @@ namespace Rachael.AzureFunction.Dialogs
                 Title = $"{tweet.UserFriendlyName} @{tweet.Username} - {month} {tweet.CreatedAt.Day}",
                 Text = tweet.Text,
                 Images = 
-                    string.IsNullOrEmpty(tweet.PreviewImageUrl) ?
-                    null :
-                    new List<CardImage>
-                    {
-                        new CardImage($"{tweet.PreviewImageUrl}")
-                    },
+                    tweet.PreviewImageUrls.Any() ?
+                    tweet.PreviewImageUrls.Select(x => new CardImage(x)).ToList() :
+                    null,
                 Buttons = new List<CardAction>
                 {
                     new CardAction(ActionTypes.OpenUrl, "View tweet",

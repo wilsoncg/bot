@@ -40,8 +40,7 @@
                             "wrap": true
                         }
                     ],
-                    "width": "stretch",
-                    "backgroundImage": {}
+                    "width": "stretch"
                 }
             ]
         },
@@ -51,9 +50,8 @@
             "wrap": true
         },
         {
-            "type": "Image",
-            "url": "${PreviewImageUrl}",
-            "size": "Stretch"
+            "type": "ImageSet",
+            "images": "${PreviewImages}"
         }
     ],
     "actions": [
