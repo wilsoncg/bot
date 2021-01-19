@@ -11,9 +11,13 @@
 * Custom OAuth [ASP.NET DelegatingHandler](https://docs.microsoft.com/en-us/aspnet/web-api/overview/advanced/http-message-handlers)
 * Uses Adaptive cards **[v1.2](https://adaptivecards.io/designer/)** for web chat
 
-### Running as an Azure Function, requires:
-* Microsoft.NET.Sdk.Functions - [Azure Functions docs](https://docs.microsoft.com/en-us/azure/azure-functions/)
-* Microsoft.Bot.Builder.Azure - [Bot Framework SDK docs](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0)
+## To build & Run:
+
+* Using [Azure Functions Core Tools v3](https://github.com/Azure/azure-functions-core-tools)
+```
+$ func host start --csharp
+```
+* Install `ms-azuretools.vscode-azurefunctions` vscode extension. Then `F5` for Debugging in VSCode.
 
 ### Run botframework-cli tools locally
 ```
@@ -36,6 +40,10 @@ Adaptive cards are only supported in certain channels. We therefore render tweet
 ### Tweet as AdaptiveCard:
 
 ![Tweet as AdaptiveCard](tweet-adaptivecard.png)
+
+## Nuget referenced packages:
+* Microsoft.NET.Sdk.Functions - [Azure Functions docs](https://docs.microsoft.com/en-us/azure/azure-functions/)
+* Microsoft.Bot.Builder.Azure - [Bot Framework SDK docs](https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0)
 
 ## Useful links:
 
